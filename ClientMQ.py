@@ -3,6 +3,7 @@ import threading
 import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
 from tkinter import ttk
+from time import sleep
 from sys import exit
 
 Pyro4.config.SERIALIZERS_ACCEPTED = {'serpent', 'marshal'}
@@ -11,7 +12,7 @@ server = None
 
 def threaded(func):
     def wrapper(*args, **kwargs):
-        return threading.Thread(target=func, args=args, kwargs=kwargs).start()
+        return threading.Thread(target=func, args=args, kwargs=kwargs, daemon=True).start()
     return wrapper
 
 @threaded
@@ -249,9 +250,11 @@ class Main_menu(tk.Frame):
             try:
                 if self.contacts[address].pendent_messages == 1:
                     self.notify_list[address].config('1 mensagem!')
+                    sleep(0.05)
                     self.update()
                 else:
                     self.notify_list[address].config(f'{self.contacts[address].pendent_messages} mensagems!')
+                    sleep(0.05)
                     self.update()
             except:
                 pass
@@ -278,6 +281,7 @@ class Main_menu(tk.Frame):
                     self.contacts[name] = Contact(self.master, name)
                     if window:
                         window.destroy()
+                    sleep(0.01)
                     self.update()
                 else:
                     self.message_popup('Cliente não encontrado!')
@@ -289,6 +293,7 @@ class Main_menu(tk.Frame):
                     self.contacts[name] = Topic(self.master, name)
                     if window:
                         window.destroy()
+                    sleep(0.01)
                     self.update()
                 else:
                     self.message_popup('Tópico não encontrado!')
@@ -320,6 +325,7 @@ class Main_menu(tk.Frame):
                 self.contacts[name] = Topic(self.master, name)
                 self.message_popup('Tópico criado com éxito!')
                 window.destroy()
+                sleep(0.01)
                 self.update()
 
     def delete_contact(self, name):
@@ -330,6 +336,7 @@ class Main_menu(tk.Frame):
         elif isinstance(self.contacts[name], Topic):
             server.removeQueue(name, 'topic')
         del self.contacts[name]
+        sleep(0.01)
         self.update()
 
     @Pyro4.expose
@@ -338,7 +345,12 @@ class Main_menu(tk.Frame):
         if topic:
             self.contacts[topic].message(f'{origin}: {msg}')
         else:
-            self.contacts[origin].message(f'{origin}: {msg}')
+            try:
+                self.contacts[origin].message(f'{origin}: {msg}')
+            except:
+                self.load_contact(origin, 'contact')
+                self.contacts[origin].message(f'{origin}: {msg}')
+                self.notify(1, origin)
 
     @Pyro4.expose
     def message_popup(self, msg):

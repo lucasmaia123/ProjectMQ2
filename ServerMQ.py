@@ -136,7 +136,6 @@ class Client:
     def removeQueue(self, name, type):
         global topics
         if type == 'contact':
-            http.request('GET', f'http://localhost:8161/console/jolokia/exec/org.apache.activemq.artemis:broker="0.0.0.0"/destroyQueue(java.lang.String)/{self.name}.{name}', headers=headers).json()
             http.request('GET', f'http://localhost:8161/console/jolokia/exec/org.apache.activemq.artemis:broker="0.0.0.0"/destroyQueue(java.lang.String)/{name}.{self.name}', headers=headers).json()
         elif type == 'topic':
             http.request('GET', f'http://localhost:8161/console/jolokia/exec/org.apache.activemq.artemis:broker="0.0.0.0"/destroyQueue(java.lang.String)/{name}.{self.name}', headers=headers).json()
