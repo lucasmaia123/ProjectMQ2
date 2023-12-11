@@ -148,7 +148,7 @@ class Client:
     def new_contact(self, name):
         if name in clients.keys():
             try:
-                clients[name].load_contact(self.name, 'contact')
+                clients[name].load_contact(self.name, 'client')
                 clients[name].message_popup(f'{self.name} o adicionou como contato!')
             except:
                 conn.send(name, self.name, headers={'persistent': True, 'name': self.name, 'target': name, 'type': 'new contact'})
