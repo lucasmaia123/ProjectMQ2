@@ -1,0 +1,9 @@
+2023-12-13 20:32:37,427 INFO  [io.hawt.web.auth.LoginServlet] Logging in user: admin
+2023-12-13 20:38:46,306 WARN  [org.apache.activemq.artemis.core.protocol.stomp] AMQ332069: Sent ERROR frame to STOMP client /[0:0:0:0:0:0:0:1]:49366: Connection reset
+2023-12-13 20:38:46,326 WARN  [org.apache.activemq.artemis.core.server] AMQ222067: Connection failure has been detected: Connection reset [code=GENERIC_EXCEPTION]
+2023-12-13 20:38:46,346 WARN  [org.apache.activemq.artemis.core.server] AMQ222061: Client connection failed, clearing up resources for session 662eeebe-9a10-11ee-86ec-000516581727
+2023-12-13 20:38:46,351 WARN  [org.apache.activemq.artemis.core.server] AMQ222107: Cleared up resources for session 662eeebe-9a10-11ee-86ec-000516581727
+2023-12-13 20:45:55,848 WARN  [org.apache.activemq.artemis.core.protocol.stomp] AMQ332069: Sent ERROR frame to STOMP client /[0:0:0:0:0:0:0:1]:49477: Connection reset
+2023-12-13 20:45:55,850 WARN  [org.apache.activemq.artemis.core.server] AMQ222067: Connection failure has been detected: Connection reset [code=GENERIC_EXCEPTION]
+2023-12-13 20:45:55,851 WARN  [org.apache.activemq.artemis.core.server] AMQ222061: Client connection failed, clearing up resources for session a3072551-9a11-11ee-86ec-000516581727
+2023-12-13 20:45:55,853 WARN  [org.apache.activemq.artemis.core.server] AMQ222107: Cleared up resources for session a3072551-9a11-11ee-86ec-000516581727

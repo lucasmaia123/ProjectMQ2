@@ -1,0 +1,6 @@
+2023-11-21 14:43:55,270 INFO  [org.apache.activemq.artemis] AMQ241005: Stopping embedded web server
+2023-11-21 14:43:55,291 INFO  [io.hawt.HawtioContextListener] Destroying hawtio services
+2023-11-21 14:43:55,514 INFO  [org.apache.activemq.hawtio.plugin.PluginContextListener] Destroyed artemis-plugin plugin
+2023-11-21 14:43:55,619 INFO  [org.apache.activemq.hawtio.branding.PluginContextListener] Destroyed activemq-branding plugin
+2023-11-21 14:43:54,158 INFO  [org.apache.activemq.artemis] AMQ241006: Stopped embedded web server
+2023-11-21 14:43:54,178 INFO  [org.apache.activemq.artemis.core.server] AMQ221002: Apache ActiveMQ Artemis Message Broker version 2.31.2 [89ced9c9-7e67-11ee-98bc-000516581727] stopped, uptime 1 day
