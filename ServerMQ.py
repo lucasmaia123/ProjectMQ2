@@ -27,7 +27,9 @@ def load_server_data():
     global clients, topics
     addresses = http.request('GET', f'http://localhost:8161/console/jolokia/exec/org.apache.activemq.artemis:broker="0.0.0.0"/listAddresses(java.lang.String)/,', headers=headers).json()
     addresses = addresses['value'].split(',')
-    for address in addresses[4:]:
+    for address in addresses:
+        if address in ['DLQ', 'ExpiryQueue', 'activemq.notifications', '$sys.mqtt.sessions']:
+            continue
         address_info = http.request('GET', f'http://localhost:8161/console/jolokia/exec/org.apache.activemq.artemis:broker="0.0.0.0"/getAddressInfo/{address}', headers=headers).json()
         address_info = address_info['value']
         if 'ANYCAST' in address_info:
@@ -49,7 +51,7 @@ def start_ns():
 
 class Listener(stomp.ConnectionListener):
     def on_error(self, frame):
-        print(f'[ERROR] {frame.headers["Error"]}')
+        print(f'[ERROR] {frame.headers["error"]}')
     
     def on_message(self, frame):
         origin = frame.headers['name']
@@ -136,7 +138,7 @@ class Client:
     def removeQueue(self, name, type):
         global topics
         if type == 'contact':
-            http.request('GET', f'http://localhost:8161/console/jolokia/exec/org.apache.activemq.artemis:broker="0.0.0.0"/destroyQueue(java.lang.String)/{name}.{self.name}', headers=headers).json()
+            http.request('GET', f'http://localhost:8161/console/jolokia/exec/org.apache.activemq.artemis:broker="0.0.0.0"/destroyQueue(java.lang.String)/{self.name}.{name}', headers=headers).json()
         elif type == 'topic':
             http.request('GET', f'http://localhost:8161/console/jolokia/exec/org.apache.activemq.artemis:broker="0.0.0.0"/destroyQueue(java.lang.String)/{name}.{self.name}', headers=headers).json()
             topics[name].remove(self.name)
@@ -172,6 +174,10 @@ class Client:
     @Pyro4.expose
     def send_message(self, msg, target, type):
         if type == 'contact':
+            request = http.request('GET', f'http://localhost:8161/console/jolokia/exec/org.apache.activemq.artemis:broker="0.0.0.0",component=addresses,address="{target}",subcomponent=queues,routing-type="multicast",queue="{target}.{self.name}"/browse()', headers=headers).json()
+            if request['status'] != 200:
+                q_json = json.dumps({"name": f"{target}.{self.name}", "address": target, "routing-type": "ANYCAST", "durable": True})
+                http.request('GET', f'http://localhost:8161/console/jolokia/exec/org.apache.activemq.artemis:broker="0.0.0.0"/createQueue(java.lang.String)/{q_json}', headers=headers).json()
             conn.send(f'{target}::{target}.{self.name}', msg, headers={'persistent': True, 'name': self.name, 'target': target, 'type': type})
             try:
                 clients[target].notify(1, self.name)

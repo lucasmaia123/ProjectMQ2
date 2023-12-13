@@ -33,16 +33,23 @@ class Topic(tk.Toplevel):
             self.open = True
         
         super().__init__(self.master, height=400, width=400)
-        tk.Label(self, text=f'Tópico {self.name}').pack(padx=20, pady=10)
-        tk.Button(self, text='Listar membros', command=self.list_members).pack(side='right', padx=20, pady=10)
 
-        self.textBox = ScrolledText(self, wrap=tk.WORD, state='disabled')
+        top_frame = tk.Frame(self, height=50)
+        top_frame.pack(fill='x')
+
+        tk.Label(top_frame, text=f'Tópico {self.name}').pack(side='left', padx=20, pady=10)
+        tk.Button(top_frame, text='Listar membros', command=self.list_members).pack(side='right', padx=20, pady=10)
+
+        text_frame = tk.Frame(self, height=350)
+        text_frame.pack(fill='x')
+
+        self.textBox = ScrolledText(text_frame, wrap=tk.WORD, state='disabled')
         self.textBox.config(height=20, width=50)
         self.textBox.pack(padx=10, pady=10)
 
-        tk.Label(self, text='Send a message:').pack(padx=5)
-        self.entry = tk.Entry(self, width=50)
-        self.entry.pack(side='right', padx=5, pady=5)
+        tk.Label(text_frame, text='Send a message:').pack(padx=5)
+        self.entry = tk.Entry(text_frame, width=50)
+        self.entry.pack(padx=5, pady=5)
         self.entry.bind('<Return>', lambda e: self.send_message())
         self.entry.focus()
 
@@ -58,9 +65,10 @@ class Topic(tk.Toplevel):
             return
         counter = 0
         for member in members:
-            tk.Label(window, text=f'{member}').grid(row=counter, column=0, padx=5, pady=5)
-            tk.Button(window, text='Adicionar contato', command=lambda: client.add_contact(member, 'client')).grid(row=counter, column=1)
-            counter+=1
+            if member != client.name:
+                tk.Label(window, text=f'{member}').grid(row=counter, column=0, padx=5, pady=5)
+                tk.Button(window, text='Adicionar contato', command=lambda: client.add_contact(member, 'client')).grid(row=counter, column=1)
+                counter+=1
 
     def send_message(self, event = None):
         msg = self.entry.get()
@@ -102,7 +110,7 @@ class Contact(tk.Toplevel):
 
         tk.Label(self, text='Digite uma mensagem:').pack(padx=5)
         self.entry = tk.Entry(self, width=50)
-        self.entry.pack(side='right', padx=5, pady=5)
+        self.entry.pack(padx=5, pady=5)
         self.entry.bind('<Return>', lambda e: self.send_message())
 
         server.open_connection(self.name)
@@ -231,12 +239,13 @@ class Main_menu(tk.Frame):
                     tk.Label(self.scrollFrame, text='Grupo').grid(row=counter, column=1, padx=5, pady=5)
                     tk.Button(self.scrollFrame, text='Entrar', command=contact.open_topic).grid(row=counter, column=2, padx=5, pady=5)
                     tk.Button(self.scrollFrame, text='Sair do grupo', command=lambda contact=contact: self.delete_contact(contact.name)).grid(row=counter, column=3, padx=5, pady=5)
+                self.notify_list[contact] = tk.Label(self.scrollFrame)
+                self.notify_list[contact].grid(row=counter, column=4, padx=5, pady=5)
                 if contact.pendent_messages > 0:
                     if contact.pendent_messages == 1:
-                        self.notify_list[contact] = tk.Label(self.scrollFrame, text='1 mensagem!')
+                        self.notify_list[contact].config(text='1 mensagem!')
                     else:
-                        self.notify_list[contact] = tk.Label(self.scrollFrame, text=f'{contact.pendent_messages} mensagems!')
-                    self.notify_list[contact].grid(row=counter, column=4, padx=5, pady=5)
+                        self.notify_list[contact].config(text=f'{contact.pendent_messages} mensagems!')
 
     def update(self):
         self.canvas.delete(self.frame)
@@ -250,12 +259,8 @@ class Main_menu(tk.Frame):
             try:
                 if self.contacts[address].pendent_messages == 1:
                     self.notify_list[address].config('1 mensagem!')
-                    sleep(0.05)
-                    self.update()
                 else:
                     self.notify_list[address].config(f'{self.contacts[address].pendent_messages} mensagems!')
-                    sleep(0.05)
-                    self.update()
             except:
                 pass
 
@@ -266,12 +271,15 @@ class Main_menu(tk.Frame):
         ttk.Radiobutton(window, text='Cliente', variable=radio_var, value='client').grid(row=1, column=0, padx=5, pady=5)
         ttk.Radiobutton(window, text='Tópico', variable=radio_var, value='topic').grid(row=1, column=1, padx=5, pady=5)
         entry = tk.Entry(window, width=50)
-        entry.grid(row=2, column=0, padx=5, pady=5)
+        entry.grid(row=2, column=0, padx=10, pady=10)
         entry.bind('<Return>', lambda e: self.add_contact(entry.get(), radio_var.get(), window))
         entry.focus()
 
     def add_contact(self, name, type, window=None, event=None):
         if name and type:
+            if name == self.name:
+                self.message_popup('Você não pode adicionar a si mesmo!')
+                return
             if name in self.contacts.keys():
                 self.message_popup('Você já tem esse contato!')
                 return
@@ -312,7 +320,7 @@ class Main_menu(tk.Frame):
         window = tk.Toplevel(self.master, height=200, width=300)
         tk.Label(window, text='Digite o nome do tópico a ser criado:').pack(padx=5, pady=5)
         entry = tk.Entry(window, width=50)
-        entry.pack(padx=5, pady=5)
+        entry.pack(padx=10, pady=10)
         entry.bind('<Return>', lambda e: self.create_topic(entry.get(), window))
         entry.focus()
 
